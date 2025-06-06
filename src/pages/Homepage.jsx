@@ -1,41 +1,70 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link as ScrollLink } from 'react-scroll';
 
 const Homepage = () => {
   return (
-    <div className="w-full h-screen bg-white flex flex-col md:flex-row items-center justify-between px-6 md:px-16 py-8 md:py-0 relative overflow-hidden rounded-[32px]">
-      {/* Top Wave */}
-      <img
-        src="/assets/topwave.png"
-        alt="Top Wave"
-        className="absolute top-0 right-0 w-[140px] md:w-[220px] z-0"
-      />
+    <div className="font-sans w-full h-full bg-white text-black">
+      {/* Navbar */}
+      <header className="fixed w-full top-0 left-0 bg-white shadow-md z-50 px-8 py-4 flex items-center justify-between">
+        {/* Logo */}
+        <img src="/assets/rentmyfit_text_logo.png" alt="RentMyFit" className="w-36" />
 
-      {/* Left Content */}
-      <div className="flex flex-col justify-center items-start w-full md:w-1/2 space-y-8 z-10">
-        <img
-          src="/assets/rentmyfit_text_logo.png"
-          alt="RentMyFit Logo"
-          className="w-48 md:w-56"
-        />
-        <h1 className="text-2xl md:text-3xl font-semibold text-left">
-          Why buy it once when you can rent <br /> the runway every time?
+        {/* Nav */}
+        <nav className="space-x-6 hidden md:flex">
+          {['home', 'about', 'pricing', 'contact'].map((section) => (
+            <ScrollLink
+              key={section}
+              to={section}
+              smooth
+              duration={500}
+              className="cursor-pointer text-pink-700 hover:text-pink-800 capitalize"
+            >
+              {section === 'home' ? 'Home' : section === 'about' ? 'About Us' : section === 'pricing' ? 'Pricing' : 'Contact Us'}
+            </ScrollLink>
+          ))}
+        </nav>
+      </header>
+
+      {/* Hero Section */}
+      <section id="home" className="flex flex-col items-center justify-center min-h-[90vh] pt-32 px-6 text-center">
+        <img src="/assets/rf.png" alt="RF Illustration" className="w-32 md:w-40 mb-6" />
+
+        <h1 className="text-3xl md:text-5xl font-bold mb-6">
+          Why own when you can Rent the Runway Every Time
         </h1>
-        <Link to="/login">
+        <p className="text-lg md:text-xl text-gray-600 max-w-xl mb-8">
+          RentMyFit gives you access to premium fashion without the commitment. Style smarter. Spend less. Look better.
+        </p>
+        <a href="/login">
           <button className="bg-pink-700 text-white px-8 py-3 rounded-full text-lg hover:bg-pink-800 transition">
             Start Renting
           </button>
-        </Link>
-      </div>
+        </a>
+      </section>
 
-      {/* Right Illustration */}
-      <div className="hidden md:flex w-1/2 justify-end z-10">
-        <img
-          src="/assets/rf.png"
-          alt="Illustration"
-          className="w-[220px] lg:w-[260px] object-contain"
-        />
-      </div>
+      {/* About Section */}
+      <section id="about" className="min-h-screen px-6 py-20 bg-gray-50 text-center">
+        <h2 className="text-3xl font-bold mb-4 text-pink-700">About Us</h2>
+        <p className="max-w-3xl mx-auto text-gray-600 text-lg">
+          We’re on a mission to make luxury fashion accessible to everyone. Whether it’s a weekend event or a wedding, RentMyFit lets you shine without the full price tag.
+        </p>
+      </section>
+
+      {/* Pricing Section */}
+      <section id="pricing" className="min-h-screen px-6 py-20 text-center">
+        <h2 className="text-3xl font-bold mb-4 text-pink-700">Pricing</h2>
+        <p className="max-w-2xl mx-auto text-gray-600 text-lg">
+          Plans start as low as $29/month. One-time rentals available. Free returns. No dry cleaning stress. Pay only for the days you wear it.
+        </p>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="min-h-screen px-6 py-20 bg-gray-50 text-center">
+        <h2 className="text-3xl font-bold mb-4 text-pink-700">Contact Us</h2>
+        <p className="max-w-xl mx-auto text-gray-600 text-lg">
+          Have questions? We're here to help. Drop us a message and our style team will get back to you within 24 hours.
+        </p>
+      </section>
     </div>
   );
 };
