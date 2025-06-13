@@ -28,6 +28,7 @@ const Register = () => {
         return setError(data.message || 'Registration failed');
       }
 
+      alert('You are now registered. You can log in.');
       navigate('/login');
     } catch (err) {
       setError('Server error');

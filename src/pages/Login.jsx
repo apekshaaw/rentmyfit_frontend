@@ -11,24 +11,28 @@ const Login = () => {
     setError('');
 
     if (!email || !password) {
-      setError('Please fill in all fields');
-      return;
+      return setError('Please fill in all fields');
     }
 
     try {
       const res = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password }), // ✅ correct key names
       });
 
       const data = await res.json();
 
-      if (res.ok) {
+      if (!res.ok) {
+        return setError(data.message || 'Invalid credentials');
+      }
+
+      // ✅ Login only if token is received
+      if (data.token) {
         localStorage.setItem('token', data.token);
         navigate('/dashboard');
       } else {
-        setError(data.message || 'Login failed');
+        setError('Invalid credentials');
       }
     } catch (err) {
       setError('Server error');
@@ -44,8 +48,8 @@ const Login = () => {
           <h3 className="text-center text-xl font-bold text-black">WELCOME</h3>
 
           <input
-            type="text"
-            placeholder="Enter Username"
+            type="email"
+            placeholder="Enter Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full border border-pink-700 text-black px-4 py-3 rounded-full bg-white placeholder-gray-500 focus:outline-pink-500"
@@ -86,7 +90,7 @@ const Login = () => {
         </div>
       </div>
 
-      {/* Right side - Just RF */}
+      {/* Right side - RF Illustration */}
       <div className="hidden md:flex relative w-1/2 h-full items-center justify-center bg-[#fff0f5]">
         <img
           src="/assets/rf.png"
