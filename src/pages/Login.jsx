@@ -40,7 +40,6 @@ const Login = () => {
 
   return (
     <div className="flex h-screen w-full bg-white overflow-hidden">
-      {/* Left side - Login Box */}
       <div className="w-full md:w-1/2 h-full flex items-center justify-center z-10 bg-white">
         <div className="w-[90%] max-w-md bg-[#ffe6f0] rounded-[40px] p-8 md:p-10 shadow-md space-y-6">
           <h2 className="text-center text-3xl font-bold text-pink-700">LOGIN</h2>
