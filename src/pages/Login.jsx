@@ -89,7 +89,6 @@ const Login = () => {
         </div>
       </div>
 
-      {/* Right side - RF Illustration */}
       <div className="hidden md:flex relative w-1/2 h-full items-center justify-center bg-[#fff0f5]">
         <img
           src="/assets/rf.png"
