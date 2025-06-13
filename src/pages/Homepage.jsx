@@ -25,7 +25,6 @@ const Homepage = () => {
         </nav>
       </header>
 
-      {/* Hero Section */}
       <section id="home" className="flex flex-col items-center justify-center min-h-[90vh] pt-32 px-6 text-center">
         <img src="/assets/rf.png" alt="RF Illustration" className="w-32 md:w-40 mb-6" />
 
@@ -42,7 +41,6 @@ const Homepage = () => {
         </a>
       </section>
 
-      {/* About Section */}
       <section id="about" className="min-h-screen px-6 py-20 bg-gray-50 text-center">
         <h2 className="text-3xl font-bold mb-4 text-pink-700">About Us</h2>
         <p className="max-w-3xl mx-auto text-gray-600 text-lg">
