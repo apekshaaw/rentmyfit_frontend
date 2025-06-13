@@ -50,7 +50,6 @@ const Homepage = () => {
         </p>
       </section>
 
-      {/* Pricing Section */}
       <section id="pricing" className="min-h-screen px-6 py-20 text-center">
         <h2 className="text-3xl font-bold mb-4 text-pink-700">Pricing</h2>
         <p className="max-w-2xl mx-auto text-gray-600 text-lg">
@@ -58,7 +57,6 @@ const Homepage = () => {
         </p>
       </section>
 
-      {/* Contact Section */}
       <section id="contact" className="min-h-screen px-6 py-20 bg-gray-50 text-center">
         <h2 className="text-3xl font-bold mb-4 text-pink-700">Contact Us</h2>
         <p className="max-w-xl mx-auto text-gray-600 text-lg">
