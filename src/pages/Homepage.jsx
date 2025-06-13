@@ -4,12 +4,9 @@ import { Link as ScrollLink } from 'react-scroll';
 const Homepage = () => {
   return (
     <div className="font-sans w-full h-full bg-white text-black">
-      {/* Navbar */}
       <header className="fixed w-full top-0 left-0 bg-white shadow-md z-50 px-8 py-4 flex items-center justify-between">
-        {/* Logo */}
         <img src="/assets/rentmyfit_text_logo.png" alt="RentMyFit" className="w-36" />
 
-        {/* Nav */}
         <nav className="space-x-6 hidden md:flex">
           {['home', 'about', 'pricing', 'contact'].map((section) => (
             <ScrollLink
