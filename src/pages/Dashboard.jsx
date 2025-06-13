@@ -19,16 +19,13 @@ export default function Dashboard() {
 
   return (
     <div className="flex h-screen w-full bg-white">
-      {/* Sidebar */}
       <div className="w-64 bg-pink-700 text-white flex flex-col justify-between py-6 px-4">
         <div>
-          {/* Logo */}
           <div className="flex items-center space-x-2 mb-10">
             <img src="/assets/rff.png" alt="RF Logo" className="w-8 h-8" />
             <span className="text-xl font-bold">RentMyFit</span>
           </div>
 
-          {/* Navigation Links */}
           <nav className="space-y-6 text-base">
             <Link to="/orders" className="flex items-center space-x-3 text-white hover:text-gray-300 transition">
               <FaBoxOpen />
@@ -65,7 +62,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 bg-white p-10">
         <h1 className="text-2xl font-bold text-black">About Us</h1>
       </div>
