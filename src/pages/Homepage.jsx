@@ -1,63 +1,109 @@
-import React from 'react';
-import { Link as ScrollLink } from 'react-scroll';
+import { useEffect, useState } from 'react';
+import { fetchProducts } from '../api';
+import { FaHeart, FaShoppingCart, FaSearch, FaBell } from 'react-icons/fa';
+
+const categories = [
+  'Popular',
+  'New Arrivals',
+  'Dress',
+  'Shoe',
+  'Bag',
+  'Accessories',
+  'Designer',
+  'Ethnicwear',
+  'Casual',
+  'Formal',
+];
 
 const Homepage = () => {
+  const [products, setProducts] = useState([]);
+  const [activeCategory, setActiveCategory] = useState('Popular');
+
+  const loadProducts = async () => {
+    try {
+      const data = await fetchProducts();
+      setProducts(data);
+    } catch (err) {
+      console.error('Error loading products:', err);
+    }
+  };
+
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
+  const filteredProducts =
+    activeCategory === 'Popular'
+      ? products
+      : products.filter((p) =>
+          p.category?.toLowerCase().includes(activeCategory.toLowerCase())
+        );
+
   return (
-    <div className="font-sans w-full h-full bg-white text-black">
-      <header className="fixed w-full top-0 left-0 bg-white shadow-md z-50 px-8 py-4 flex items-center justify-between">
+    <div className="min-h-screen bg-white text-black">
+      {/* Top bar */}
+      <header className="flex justify-between items-center px-6 py-4 shadow-md sticky top-0 bg-white z-50">
         <img src="/assets/rentmyfit_text_logo.png" alt="RentMyFit" className="w-36" />
 
-        <nav className="space-x-6 hidden md:flex">
-          {['home', 'about', 'pricing', 'contact'].map((section) => (
-            <ScrollLink
-              key={section}
-              to={section}
-              smooth
-              duration={500}
-              className="cursor-pointer text-pink-700 hover:text-pink-800 capitalize"
-            >
-              {section === 'home' ? 'Home' : section === 'about' ? 'About Us' : section === 'pricing' ? 'Pricing' : 'Contact Us'}
-            </ScrollLink>
-          ))}
-        </nav>
+        <div className="flex items-center space-x-6 text-pink-700 text-xl">
+          <FaSearch className="cursor-pointer" />
+          <FaBell className="cursor-pointer" />
+          <FaShoppingCart className="cursor-pointer" />
+        </div>
       </header>
 
-      <section id="home" className="flex flex-col items-center justify-center min-h-[90vh] pt-32 px-6 text-center">
-        <img src="/assets/rf.png" alt="RF Illustration" className="w-32 md:w-40 mb-6" />
-
-        <h1 className="text-3xl md:text-5xl font-bold mb-6">
-          Why own when you can Rent the Runway Every Time
-        </h1>
-        <p className="text-lg md:text-xl text-gray-600 max-w-xl mb-8">
-          RentMyFit gives you access to premium fashion without the commitment. Style smarter. Spend less. Look better.
-        </p>
-        <a href="/login">
-          <button className="bg-pink-700 text-white px-8 py-3 rounded-full text-lg hover:bg-pink-800 transition">
-            Start Renting
+      {/* Categories tabs */}
+      <div className="flex space-x-3 overflow-x-auto px-6 py-4 border-b">
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            onClick={() => setActiveCategory(cat)}
+            className={`px-4 py-2 text-sm font-semibold rounded-full whitespace-nowrap ${
+              activeCategory === cat
+                ? 'bg-pink-700 text-white'
+                : 'bg-gray-200 text-pink-700'
+            }`}
+          >
+            {cat}
           </button>
-        </a>
-      </section>
+        ))}
+      </div>
 
-      <section id="about" className="min-h-screen px-6 py-20 bg-gray-50 text-center">
-        <h2 className="text-3xl font-bold mb-4 text-pink-700">About Us</h2>
-        <p className="max-w-3xl mx-auto text-gray-600 text-lg">
-          We’re on a mission to make luxury fashion accessible to everyone. Whether it’s a weekend event or a wedding, RentMyFit lets you shine without the full price tag.
-        </p>
-      </section>
-
-      <section id="pricing" className="min-h-screen px-6 py-20 text-center">
-        <h2 className="text-3xl font-bold mb-4 text-pink-700">Pricing</h2>
-        <p className="max-w-2xl mx-auto text-gray-600 text-lg">
-          Plans start as low as $29/month. One-time rentals available. Free returns. No dry cleaning stress. Pay only for the days you wear it.
-        </p>
-      </section>
-
-      <section id="contact" className="min-h-screen px-6 py-20 bg-gray-50 text-center">
-        <h2 className="text-3xl font-bold mb-4 text-pink-700">Contact Us</h2>
-        <p className="max-w-xl mx-auto text-gray-600 text-lg">
-          Have questions? We're here to help. Drop us a message and our style team will get back to you within 24 hours.
-        </p>
-      </section>
+      {/* Products */}
+      <div className="px-6 py-8">
+        {filteredProducts.length === 0 ? (
+          <p className="text-center text-gray-600">No products found.</p>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {filteredProducts.map((product) => (
+              <div
+                key={product._id}
+                className="bg-white rounded-2xl p-4 shadow hover:shadow-lg flex flex-col"
+              >
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="w-full h-48 object-cover rounded-xl mb-3"
+                />
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="font-semibold text-md">{product.name}</h3>
+                  <FaHeart className="text-pink-600 cursor-pointer" />
+                </div>
+                <p className="text-pink-700 font-semibold mb-1">${product.price}</p>
+                <p className="text-sm text-gray-600 mb-2">
+                  Sizes:{' '}
+                  {product.sizes && product.sizes.length > 0
+                    ? product.sizes.join(', ')
+                    : 'N/A'}
+                </p>
+                <button className="mt-auto px-4 py-2 bg-pink-700 text-white rounded-full hover:bg-pink-800 transition">
+                  Rent Now
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
