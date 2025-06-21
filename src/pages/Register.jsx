@@ -19,7 +19,11 @@ const Register = () => {
       const res = await fetch('http://localhost:5000/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+        }),
       });
 
       const data = await res.json();
@@ -31,6 +35,7 @@ const Register = () => {
       alert('You are now registered. You can log in.');
       navigate('/login');
     } catch (err) {
+      console.error('Register Error:', err);
       setError('Server error');
     }
   };
