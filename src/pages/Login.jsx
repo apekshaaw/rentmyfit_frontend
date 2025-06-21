@@ -18,7 +18,7 @@ const Login = () => {
       const res = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }), 
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
@@ -29,11 +29,14 @@ const Login = () => {
 
       if (data.token) {
         localStorage.setItem('token', data.token);
-        navigate('/dashboard');
-      } else {
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('role', data.user.role); // <--- THIS FIXES ADMIN PANEL
+        navigate('/dashboard?tab=home');
+      }else {
         setError('Invalid credentials');
       }
     } catch (err) {
+      console.error('Login Error:', err);
       setError('Server error');
     }
   };
