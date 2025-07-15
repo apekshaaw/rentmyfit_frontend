@@ -28,11 +28,11 @@ const Login = () => {
       }
 
       if (data.token) {
-        localStorage.setItem('token', data.token);
+        localStorage.setItem('token', data.token); // ✅ fixed here
         localStorage.setItem('user', JSON.stringify(data.user));
-        localStorage.setItem('role', data.user.role); // <--- THIS FIXES ADMIN PANEL
+        localStorage.setItem('role', data.user.role);
         navigate('/dashboard?tab=home');
-      }else {
+      } else {
         setError('Invalid credentials');
       }
     } catch (err) {
