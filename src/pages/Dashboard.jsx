@@ -13,7 +13,8 @@ import {
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import ProductGrid from '../components/ProductGrid';
 import DashboardHeader from '../components/DashboardHeader';
-import Profile from '../pages/Profile';  // ✅ import Profile
+import Profile from '../pages/Profile';
+import Wishlist from '../pages/Wishlist';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ export default function Dashboard() {
       case 'home':
         return <ProductGrid />;
       case 'wishlist':
-        return <h1 className="text-2xl font-bold text-black">Your Wishlist</h1>;
+        return <Wishlist />;
       case 'address':
         return <h1 className="text-2xl font-bold text-black">Delivery Address</h1>;
       case 'payment':
