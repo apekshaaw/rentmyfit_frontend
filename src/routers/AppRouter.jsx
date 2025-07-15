@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import LandingPage from '../pages/LandingPage';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
@@ -13,39 +14,50 @@ import Help from '../pages/Help';
 import About from '../pages/About';
 import Profile from '../pages/Profile';
 import EditProfile from '../pages/EditProfile';
+import { isTokenExpired } from '../utils/token';
+
+const RouterWrapper = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token && isTokenExpired(token)) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      navigate('/login');
+    }
+  }, [navigate]);
+
+  return (
+    <Routes>
+      {/* Public Routes */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/product/:id" element={<ProductDetails />} />
+
+      {/* Admin */}
+      <Route path="/admin/products" element={<AdminProducts />} />
+
+      {/* Dashboard as parent layout */}
+      <Route path="/dashboard" element={<Dashboard />}>
+        <Route path="orders" element={<Orders />} />
+        <Route path="wishlist" element={<Wishlist />} />
+        <Route path="address" element={<Address />} />
+        <Route path="payment" element={<Payment />} />
+        <Route path="help" element={<Help />} />
+        <Route path="about" element={<About />} />
+        <Route path="profile" element={<Profile />} />
+        <Route path="edit-profile" element={<EditProfile />} />
+      </Route>
+    </Routes>
+  );
+};
 
 export default function AppRouter() {
   return (
     <BrowserRouter>
-      <Routes>
-        {/* Landing Page */}
-        <Route path="/" element={<LandingPage />} />
-
-        {/* Dashboard */}
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/dashboard/orders" element={<Orders />} />
-        <Route path="/dashboard/wishlist" element={<Wishlist />} />
-        <Route path="/dashboard/address" element={<Address />} />
-        <Route path="/dashboard/payment" element={<Payment />} />
-        <Route path="/dashboard/help" element={<Help />} />
-        <Route path="/dashboard/about" element={<About />} />
-
-        {/* Profile inside Dashboard */}
-        <Route path="/dashboard/profile" element={<Dashboard />} />
-
-        {/* Edit Profile page */}
-        <Route path="/dashboard/edit-profile" element={<EditProfile />} />
-
-        {/* Product Details */}
-        <Route path="/product/:id" element={<ProductDetails />} />
-
-        {/* Admin */}
-        <Route path="/admin/products" element={<AdminProducts />} />
-
-        {/* Auth */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-      </Routes>
+      <RouterWrapper />
     </BrowserRouter>
   );
 }
