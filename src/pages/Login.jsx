@@ -21,16 +21,104 @@ const Login = () => {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await res.json();
+      const text = await res.text();
+      let data;
+
+      try {
+        data = JSON.parse(text);
+      } catch (err) {
+        console.error('Login Error: Invalid JSON from backend:', err.message);
+        return setError('Server error');
+      }
 
       if (!res.ok) {
         return setError(data.message || 'Invalid credentials');
       }
 
       if (data.token) {
-        localStorage.setItem('token', data.token); // ✅ fixed here
-        localStorage.setItem('user', JSON.stringify(data.user));
+        // 🧹 Clean old cart if different user
+        let prevUser = null;
+        try {
+          const stored = localStorage.getItem('user');
+          if (stored && stored !== 'undefined') {
+            prevUser = JSON.parse(stored);
+          }
+        } catch (err) {
+          console.warn('Invalid user JSON in localStorage');
+        }
+
+        if (prevUser && prevUser._id && prevUser._id !== data.user._id) {
+          localStorage.removeItem(`cart_${prevUser._id}`);
+        }
+
+        // ✅ Save new auth data
+        localStorage.setItem('token', data.token);
+        if (data?.user) {
+  const normalizedUser = {
+    ...data.user,
+    _id: data.user.id || data.user._id, 
+  };
+  localStorage.setItem('user', JSON.stringify(normalizedUser));
+} else {
+  console.warn('Login response missing user data');
+}
+
+
         localStorage.setItem('role', data.user.role);
+
+        // 🛒 Get backend cart
+        const cartRes = await fetch('http://localhost:5000/api/auth/cart', {
+          headers: {
+            Authorization: `Bearer ${data.token}`,
+          },
+        });
+
+        const backendCart = cartRes.ok ? (await cartRes.json()).cart || [] : [];
+
+        // 🧠 Get existing local cart
+        let localCart = [];
+        const localCartKey = `cart_${data.user._id}`;
+
+        try {
+          const storedCart = localStorage.getItem(localCartKey);
+          if (storedCart && storedCart !== 'undefined') {
+            localCart = JSON.parse(storedCart);
+          }
+        } catch (err) {
+          console.warn('Invalid cart JSON in localStorage:', err.message);
+        }
+
+        // 🔀 Merge local and backend carts
+        const mergedCart = [...backendCart];
+
+        for (const localItem of localCart) {
+          const existingIndex = mergedCart.findIndex(
+            (item) =>
+              item.product === localItem.product &&
+              item.selectedSize === localItem.selectedSize
+          );
+
+          if (existingIndex !== -1) {
+            mergedCart[existingIndex].quantity += localItem.quantity;
+          } else {
+            mergedCart.push(localItem);
+          }
+        }
+
+        // 💾 Save merged cart locally
+        localStorage.setItem(localCartKey, JSON.stringify(mergedCart));
+
+        // ☁️ Overwrite backend with merged cart
+        await fetch('http://localhost:5000/api/auth/cart/overwrite', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${data.token}`,
+          },
+          body: JSON.stringify({ cart: mergedCart }),
+        });
+
+        // ✅ Redirect
         navigate('/dashboard?tab=home');
       } else {
         setError('Invalid credentials');
@@ -100,6 +188,26 @@ const Login = () => {
       </div>
     </div>
   );
+};
+
+// ✅ Safely logout and clear cart
+export const logoutUser = () => {
+  const storedUser = localStorage.getItem('user');
+  let user = null;
+
+  try {
+    user = storedUser && storedUser !== 'undefined' ? JSON.parse(storedUser) : null;
+  } catch (err) {
+    console.warn('Invalid user JSON in localStorage:', storedUser);
+  }
+
+  if (user && user._id) {
+    localStorage.removeItem(`cart_${user._id}`);
+  }
+
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  localStorage.removeItem('role');
 };
 
 export default Login;
