@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { fetchProducts } from '../api';
 import { FaHeart } from 'react-icons/fa';
+import ProductModal from './ProductModal'; // ✅ ADD THIS
 
 const categories = [
   'Popular', 'New Arrivals', 'Dress', 'Shoe', 'Bag',
@@ -11,10 +12,10 @@ const ProductGrid = () => {
   const [products, setProducts] = useState([]);
   const [activeCategory, setActiveCategory] = useState('Popular');
   const [favorites, setFavorites] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null); // ✅ ADD MODAL STATE
 
   const token = localStorage.getItem('token');
 
-  // Fetch products + wishlist once
   useEffect(() => {
     const loadAll = async () => {
       try {
@@ -44,42 +45,42 @@ const ProductGrid = () => {
   }, [token]);
 
   const toggleFavorite = async (productId) => {
-  if (!token) {
-    alert('Please login to use wishlist.');
-    return;
-  }
+    if (!token) {
+      alert('Please login to use wishlist.');
+      return;
+    }
 
-  const isFav = favorites.includes(productId);
+    const isFav = favorites.includes(productId);
+    const url = isFav
+      ? `http://localhost:5000/api/auth/wishlist/${productId}`
+      : 'http://localhost:5000/api/auth/wishlist/add';
 
-  const url = isFav
-    ? `http://localhost:5000/api/auth/wishlist/${productId}` // DELETE
-    : 'http://localhost:5000/api/auth/wishlist/add';         // POST
+    const options = {
+      method: isFav ? 'DELETE' : 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    };
 
-  const options = {
-    method: isFav ? 'DELETE' : 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
+    if (!isFav) {
+      options.body = JSON.stringify({ productId });
+    }
+
+    try {
+      const res = await fetch(url, options);
+      if (res.ok) {
+        setFavorites((prev) =>
+          isFav ? prev.filter((id) => id !== productId) : [...prev, productId]
+        );
+      } else {
+        console.error('Failed to update wishlist:', await res.text());
+      }
+    } catch (err) {
+      console.error('Wishlist toggle failed:', err);
+    }
   };
 
-  if (!isFav) {
-    options.body = JSON.stringify({ productId });
-  }
-
-  try {
-    const res = await fetch(url, options);
-    if (res.ok) {
-      setFavorites((prev) =>
-        isFav ? prev.filter((id) => id !== productId) : [...prev, productId]
-      );
-    } else {
-      console.error('Failed to update wishlist:', await res.text());
-    }
-  } catch (err) {
-    console.error('Wishlist toggle failed:', err);
-  }
-};
   const filteredProducts =
     activeCategory === 'Popular'
       ? products
@@ -106,16 +107,20 @@ const ProductGrid = () => {
         ))}
       </div>
 
-      {/* Products Grid */}
+      {/* Product Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {filteredProducts.map((product) => (
           <div
             key={product._id}
-            className="relative bg-white rounded-2xl p-4 shadow hover:shadow-lg flex flex-col"
+            onClick={() => setSelectedProduct(product)} // ✅ OPEN MODAL
+            className="relative bg-white rounded-2xl p-4 shadow hover:shadow-lg flex flex-col cursor-pointer"
           >
-            {/* Favorite Toggle */}
+            {/* Heart Icon */}
             <button
-              onClick={() => toggleFavorite(product._id)}
+              onClick={(e) => {
+                e.stopPropagation(); // ✅ prevent modal opening
+                toggleFavorite(product._id);
+              }}
               className="absolute top-3 right-3 bg-transparent"
             >
               <FaHeart
@@ -130,14 +135,11 @@ const ProductGrid = () => {
               />
             </button>
 
-            {/* Product Image */}
             <img
               src={product.image}
               alt={product.name}
               className="w-full h-60 object-contain mb-3"
             />
-
-            {/* Product Info */}
             <h3 className="font-semibold text-md mb-1">{product.name}</h3>
             <p className="text-pink-700 font-semibold mb-1">
               ${product.price.toFixed(2)}
@@ -149,13 +151,22 @@ const ProductGrid = () => {
                 : 'N/A'}
             </p>
 
-            {/* Rent Button */}
             <button className="mt-auto px-4 py-2 bg-pink-700 text-white rounded-full hover:bg-pink-800 transition">
               Rent Now
             </button>
           </div>
         ))}
       </div>
+
+      {/* Modal */}
+      {selectedProduct && (
+        <ProductModal
+          product={selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+          isFavorite={favorites.includes(selectedProduct?._id)}
+          onToggleWishlist={toggleFavorite}
+        />
+      )}
     </div>
   );
 };
