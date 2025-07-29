@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
+import { useCart } from '../contexts/CartContext';
 import {
   FaBoxOpen,
   FaHeart,
-  FaMapMarkerAlt,
   FaCreditCard,
   FaQuestionCircle,
-  FaInfoCircle,
   FaSignOutAlt,
   FaUserShield,
   FaUserCircle,
@@ -15,6 +14,9 @@ import ProductGrid from '../components/ProductGrid';
 import DashboardHeader from '../components/DashboardHeader';
 import Profile from '../pages/Profile';
 import Wishlist from '../pages/Wishlist';
+import Payment from '../pages/Payment';
+import Help from '../pages/Help';
+import EditProfileModal from '../components/EditProfileModal';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -23,32 +25,27 @@ export default function Dashboard() {
   const defaultTab = params.get('tab') || 'home';
 
   const [activePage, setActivePage] = useState(defaultTab);
+  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false); // ✅
 
   const role = localStorage.getItem('role');
+  const { logoutUser } = useCart();
 
   const handleLogout = () => {
     localStorage.clear();
+    logoutUser();
     navigate('/login');
   };
 
   const renderContent = () => {
     switch (activePage) {
-      case 'home':
-        return <ProductGrid />;
-      case 'wishlist':
-        return <Wishlist />;
-      case 'address':
-        return <h1 className="text-2xl font-bold text-black">Delivery Address</h1>;
-      case 'payment':
-        return <h1 className="text-2xl font-bold text-black">Payment Methods</h1>;
-      case 'help':
-        return <h1 className="text-2xl font-bold text-black">Help</h1>;
-      case 'about':
-        return <h1 className="text-2xl font-bold text-black">About Us</h1>;
-      case 'profile':
-        return <Profile />;   
-      default:
-        return <ProductGrid />;
+      case 'home': return <ProductGrid />;
+      case 'wishlist': return <Wishlist />;
+      case 'cart': return <Cart />;
+      case 'payment': return <Payment />;
+      case 'help': return <Help />;
+      case 'profile': return <Profile onEditProfile={() => setShowEditProfileModal(true)} />;
+      default: return <ProductGrid />;
     }
   };
 
@@ -77,13 +74,10 @@ export default function Dashboard() {
           <nav className="space-y-2 text-base">
             {navItem('Home', <FaBoxOpen />, 'home')}
             {navItem('Wishlist', <FaHeart />, 'wishlist')}
-            {navItem('Delivery Address', <FaMapMarkerAlt />, 'address')}
             {navItem('Payment Methods', <FaCreditCard />, 'payment')}
             {navItem('Help', <FaQuestionCircle />, 'help')}
-            {navItem('About', <FaInfoCircle />, 'about')}
             {navItem('Profile', <FaUserCircle />, 'profile')}
 
-            {/* Admin Panel link only for admin */}
             {role === 'admin' && (
               <Link
                 to="/admin/products"
@@ -94,9 +88,9 @@ export default function Dashboard() {
               </Link>
             )}
 
-            {/* Log out */}
+            {/* Logout with confirmation */}
             <div
-              onClick={handleLogout}
+              onClick={() => setShowLogoutConfirm(true)} // ✅
               className="flex items-center space-x-3 px-3 py-2 rounded cursor-pointer hover:bg-pink-600 mt-4"
             >
               <FaSignOutAlt />
@@ -108,9 +102,37 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <div className="flex-1 bg-white p-6 overflow-auto">
-        <DashboardHeader />
+        <DashboardHeader onEditProfile={() => setShowEditProfileModal(true)} />
         <div className="mt-6">{renderContent()}</div>
       </div>
+
+      {/* Edit Profile Modal */}
+      {showEditProfileModal && (
+        <EditProfileModal onClose={() => setShowEditProfileModal(false)} />
+      )}
+
+      {/* ✅ Logout Confirmation Modal */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-[90%] max-w-sm text-center">
+            <p className="text-lg text-gray-800 font-medium mb-4">Do you really want to log out?</p>
+            <div className="flex justify-center space-x-4">
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 rounded bg-pink-700 text-white hover:bg-pink-800 transition"
+              >
+                Yes
+              </button>
+              <button
+                onClick={() => setShowLogoutConfirm(false)}
+                className="px-4 py-2 rounded bg-gray-300 text-gray-800 hover:bg-gray-400 transition"
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
