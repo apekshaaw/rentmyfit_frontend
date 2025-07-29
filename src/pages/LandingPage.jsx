@@ -8,7 +8,7 @@ const LandingPage = () => {
         <img src="/assets/rentmyfit_text_logo.png" alt="RentMyFit" className="w-36" />
 
         <nav className="space-x-6 hidden md:flex">
-          {['home', 'about', 'pricing', 'contact'].map((section) => (
+          {['home', 'pricing', 'contact'].map((section) => (
             <ScrollLink
               key={section}
               to={section}
@@ -18,8 +18,6 @@ const LandingPage = () => {
             >
               {section === 'home'
                 ? 'Home'
-                : section === 'about'
-                ? 'About Us'
                 : section === 'pricing'
                 ? 'Pricing'
                 : 'Contact Us'}
@@ -29,37 +27,48 @@ const LandingPage = () => {
       </header>
 
       <section
-        id="home"
-        className="flex flex-col items-center justify-center min-h-[90vh] pt-32 px-6 text-center"
-      >
-        <img
-          src="/assets/rf.png"
-          alt="RF Illustration"
-          className="w-32 md:w-40 mb-6"
-        />
+  id="home"
+  className="flex flex-col md:flex-row items-start justify-between px-6 pt-32 pb-20 gap-10 max-w-7xl mx-auto"
+>
+  {/* Text Section */}
+  <div className="md:w-1/2 text-left">
+    <h1 className="text-3xl md:text-4xl font-bold text-pink-700 mb-4">
+      Smart Style, Shared Fashion.
+    </h1>
+    <p className="text-gray-700 text-base leading-relaxed mb-6">
+      RentMyFit was born out of a simple belief that fashion should be accessible,
+      sustainable, and fun. Whether it's for a wedding, a weekend trip, or a photoshoot,
+      you shouldn’t have to spend a fortune or hoard clothes you'll never wear again.
+    </p>
+    <p className="text-gray-700 text-base leading-relaxed mb-6">
+      We're helping people across Nepal embrace fashion freedom by renting high-quality fits
+      that suit their vibe without the waste. By reducing fast fashion consumption and
+      encouraging circular usage, we’re not just saving wardrobes we’re saving the planet,
+      one fit at a time.
+    </p>
+    <p className="text-gray-700 text-base leading-relaxed mb-8">
+      From Kathmandu to Pokhara, and beyond RentMyFit is more than a rental platform.
+      It’s a movement. A lifestyle. A smarter way to wear what you love.
+    </p>
+    <a href="/login">
+      <button className="bg-pink-700 text-white px-6 py-3 rounded-full font-semibold hover:bg-pink-800 transition">
+        Start Renting
+      </button>
+    </a>
+  </div>
 
-        <h1 className="text-3xl md:text-5xl font-bold mb-6">
-          Why own when you can Rent the Runway Every Time
-        </h1>
-        <p className="text-lg md:text-xl text-gray-600 max-w-xl mb-8">
-          RentMyFit gives you access to premium fashion without the commitment. Style smarter. Spend less. Look better.
-        </p>
-        <a href="/login">
-          <button className="bg-pink-700 text-white px-8 py-3 rounded-full text-lg hover:bg-pink-800 transition">
-            Start Renting
-          </button>
-        </a>
-      </section>
+  {/* Image Section */}
+  <div className="md:w-1/2">
+    <img
+      src="/assets/about.png"
+      alt="About RentMyFit"
+      className="rounded-3xl shadow-lg w-full max-h-[450px] object-cover"
+    />
+  </div>
+</section>
 
-      <section
-        id="about"
-        className="min-h-screen px-6 py-20 bg-gray-50 text-center"
-      >
-        <h2 className="text-3xl font-bold mb-4 text-pink-700">About Us</h2>
-        <p className="max-w-3xl mx-auto text-gray-600 text-lg">
-          We’re on a mission to make luxury fashion accessible to everyone. Whether it’s a weekend event or a wedding, RentMyFit lets you shine without the full price tag.
-        </p>
-      </section>
+
+      {/* About Us section REMOVED */}
 
       <section id="pricing" className="min-h-screen px-6 py-20 text-center">
         <h2 className="text-3xl font-bold mb-4 text-pink-700">Pricing</h2>
