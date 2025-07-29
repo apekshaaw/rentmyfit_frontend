@@ -20,7 +20,7 @@ const getSizesForCategory = (category) => {
   ) {
     return ['S', 'M', 'L', 'XL', 'XXL'];
   } else {
-    return []; // For Bag, Shades → no sizes
+    return [];
   }
 };
 
@@ -32,28 +32,24 @@ const ProductForm = ({ onAdd, onClose, initialData = {}, mode = 'add' }) => {
     price: initialData.price || '',
     image: initialData.image || '',
     availability: initialData.availability || false,
+    description: initialData.description || '', // ✅ Added
   });
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
     if (name === 'sizes') {
-      if (checked) {
-        setFormData((prev) => ({
-          ...prev,
-          sizes: [...prev.sizes, value],
-        }));
-      } else {
-        setFormData((prev) => ({
-          ...prev,
-          sizes: prev.sizes.filter((s) => s !== value),
-        }));
-      }
+      setFormData((prev) => ({
+        ...prev,
+        sizes: checked
+          ? [...prev.sizes, value]
+          : prev.sizes.filter((s) => s !== value),
+      }));
     } else {
       setFormData((prev) => ({
         ...prev,
         [name]: type === 'checkbox' ? checked : value,
-        ...(name === 'category' && { sizes: [] }), // Reset sizes when category changes!
+        ...(name === 'category' && { sizes: [] }),
       }));
     }
   };
@@ -61,31 +57,23 @@ const ProductForm = ({ onAdd, onClose, initialData = {}, mode = 'add' }) => {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     const reader = new FileReader();
-
     reader.onloadend = () => {
       setFormData((prev) => ({
         ...prev,
-        image: reader.result, // base64 string
+        image: reader.result,
       }));
     };
-
-    if (file) {
-      reader.readAsDataURL(file);
-    }
+    if (file) reader.readAsDataURL(file);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       if (mode === 'edit') {
         await updateProduct(initialData._id, formData);
-        console.log('Product updated successfully');
       } else {
         await createProduct(formData);
-        console.log('Product created successfully');
       }
-
       if (onAdd) onAdd();
       onClose();
     } catch (err) {
@@ -125,7 +113,6 @@ const ProductForm = ({ onAdd, onClose, initialData = {}, mode = 'add' }) => {
             ))}
           </select>
 
-          {/* Sizes Section */}
           {getSizesForCategory(formData.category).length > 0 && (
             <div className="text-pink-700">
               <label className="font-semibold block mb-1">Available Sizes:</label>
@@ -173,6 +160,16 @@ const ProductForm = ({ onAdd, onClose, initialData = {}, mode = 'add' }) => {
               />
             )}
           </div>
+
+          {/* ✅ Description Textarea */}
+          <textarea
+            name="description"
+            placeholder="Product Description"
+            value={formData.description}
+            onChange={handleChange}
+            rows={4}
+            className="w-full border-2 border-pink-700 text-pink-700 placeholder-pink-500 px-4 py-3 rounded-lg bg-white resize-none"
+          />
 
           <div className="flex items-center space-x-2">
             <input
