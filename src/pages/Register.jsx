@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { getUser } from '../utils/getUser';
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -19,17 +20,24 @@ const Register = () => {
       const res = await fetch('http://localhost:5000/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name,
-          email,
-          password,
-        }),
+        body: JSON.stringify({ name, email, password }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
         return setError(data.message || 'Registration failed');
+      }
+
+      // 🧹 Clean up any old guest cart
+      const oldUser = getUser();
+      if (oldUser?._id) {
+        localStorage.removeItem(`cart_${oldUser._id}`);
+      }
+
+      // 📦 Create empty cart slot for new user
+      if (data?.user?.id) {
+        localStorage.setItem(`cart_${data.user.id}`, JSON.stringify([]));
       }
 
       alert('You are now registered. You can log in.');
